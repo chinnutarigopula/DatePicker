@@ -41,6 +41,7 @@
         this.maxSpan = false;
         this.autoApply = false;
         this.showTwoMonth = true;
+        this.hideRangesWhenCustomFocus = false;
         this.singleDatePicker = false;
         this.showDropdowns = false;
         this.minYear = moment().subtract(100, 'year').format('YYYY');
@@ -77,6 +78,7 @@
             cancelLabel: 'Cancel',
             weekLabel: 'W',
             customRangeLabel: 'Custom Range',
+            predefinedRangeLabel: 'Predefined Ranges',
             daysOfWeek: moment.weekdaysMin(),
             monthNames: moment.monthsShort(),
             firstDay: moment.localeData().firstDayOfWeek()
@@ -159,6 +161,14 @@
                 elem.innerHTML = options.locale.customRangeLabel;
                 var rangeHtml = elem.value;
                 this.locale.customRangeLabel = rangeHtml;
+            }
+
+            if (typeof options.locale.predefinedRangeLabel === 'string'){
+                //Support unicode chars in the custom range name.
+                var elem = document.createElement('textarea');
+                elem.innerHTML = options.locale.predefinedRangeLabel;
+                var rangeHtml = elem.value;
+                this.locale.predefinedRangeLabel = rangeHtml;
             }
         }
         this.container.addClass(this.locale.direction);
@@ -267,6 +277,9 @@
         if (typeof options.showTwoMonth === 'boolean')
             this.showTwoMonth = options.showTwoMonth;
 
+        if (typeof options.hideRangesWhenCustomFocus === 'boolean')
+            this.hideRangesWhenCustomFocus = options.hideRangesWhenCustomFocus;
+
         if (typeof options.autoUpdateInput === 'boolean')
             this.autoUpdateInput = options.autoUpdateInput;
 
@@ -354,8 +367,11 @@
             }
 
             var list = '<ul>';
+            if(this.hideRangesWhenCustomFocus){
+                list += '<li id="predefined-ranges-toggler" style="display: none" data-range-key="' + this.locale.predefinedRangeLabel + '">' + this.locale.predefinedRangeLabel + '</li>';
+            }
             for (range in this.ranges) {
-                list += '<li data-range-key="' + range + '">' + range + '</li>';
+                list += '<li class="predefined-range" data-range-key="' + range + '">' + range + '</li>';
             }
             if (this.showCustomRangeLabel) {
                 list += '<li data-range-key="' + this.locale.customRangeLabel + '">' + this.locale.customRangeLabel + '</li>';
@@ -1220,6 +1236,17 @@
             this.chosenLabel = label;
             if (label == this.locale.customRangeLabel) {
                 this.showCalendars();
+                if(this.hideRangesWhenCustomFocus){
+                    this.container.find('.ranges li.predefined-range').hide();
+                    this.container.find('.ranges li#predefined-ranges-toggler').show();
+                }
+            } else if (label == this.locale.predefinedRangeLabel) {
+                if(this.hideRangesWhenCustomFocus){
+                    if (!this.alwaysShowCalendars)
+                        this.hideCalendars();
+                    this.container.find('.ranges li.predefined-range').show();
+                    this.container.find('.ranges li#predefined-ranges-toggler').hide();
+                }
             } else {
                 var dates = this.ranges[label];
                 this.startDate = dates[0];
