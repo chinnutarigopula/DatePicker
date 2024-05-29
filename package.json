@@ -23,6 +23,6 @@
   "homepage": "https://github.com/dangrossman/daterangepicker",
   "dependencies": {
     "jquery": ">=1.10",
-    "moment": "^2.9.0"
+    "dayjs": "^1.11.11"
   }
 }
