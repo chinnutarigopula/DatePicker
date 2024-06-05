@@ -1,6 +1,6 @@
 {
   "name": "daterangepicker-dayjs-immutable",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Date range picker component for Bootstrap",
   "main": "daterangepicker.js",
   "style": "daterangepicker.css",
@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/dangrossman/daterangepicker",
   "dependencies": {
-    "jquery": ">=1.10",
-    "dayjs": "^1.11.11"
+    "daterangepicker-dayjs-immutable": "^3.2.0",
+    "dayjs": "^1.11.11",
+    "jquery": ">=1.10"
   }
 }
