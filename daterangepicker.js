@@ -1495,10 +1495,7 @@
             }
 
             if (isLeft) {
-                var start = this.startDate.clone();
-                start.hour(hour);
-                start.minute(minute);
-                start.second(second);
+                const start = this.startDate.hour(hour).minute(minute).second(second);
                 this.setStartDate(start);
                 if (this.singleDatePicker) {
                     this.endDate = this.startDate.clone();
@@ -1506,11 +1503,7 @@
                     this.setEndDate(start.clone());
                 }
             } else if (this.endDate) {
-                var end = this.endDate.clone();
-                end.hour(hour);
-                end.minute(minute);
-                end.second(second);
-                this.setEndDate(end);
+                this.setEndDate(this.endDate.hour(hour).minute(minute).second(second));
             }
 
             //update the calendars so all clickable dates reflect the new time component

@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/dangrossman/daterangepicker",
   "dependencies": {
-    "daterangepicker-dayjs-immutable": "^3.2.0",
     "dayjs": "^1.11.11",
     "jquery": ">=1.10"
   }
