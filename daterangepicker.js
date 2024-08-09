@@ -50,6 +50,7 @@
         this.timePicker = false;
         this.timePicker24Hour = false;
         this.timePickerIncrement = 1;
+        this.timePickerMinutes = false;
         this.timePickerSeconds = false;
         this.linkedCalendars = true;
         this.autoUpdateInput = true;
@@ -250,6 +251,9 @@
 
         if (typeof options.timePicker === 'boolean')
             this.timePicker = options.timePicker;
+        
+        if (typeof options.timePickerMinutes === 'boolean')
+            this.timePickerMinutes = options.timePickerMinutes;
 
         if (typeof options.timePickerSeconds === 'boolean')
             this.timePickerSeconds = options.timePickerSeconds;
@@ -575,7 +579,7 @@
                 var hour, minute, second;
                 if (this.endDate) {
                     hour = parseInt(this.container.find('.left .hourselect').val(), 10);
-                    minute = parseInt(this.container.find('.left .minuteselect').val(), 10);
+                    minute = this.timePickerMinutes ? parseInt(this.container.find('.left .minuteselect').val(), 10) : 0;
                     if (isNaN(minute)) {
                         minute = parseInt(this.container.find('.left .minuteselect option:last').val(), 10);
                     }
@@ -589,7 +593,7 @@
                     }
                 } else {
                     hour = parseInt(this.container.find('.right .hourselect').val(), 10);
-                    minute = parseInt(this.container.find('.right .minuteselect').val(), 10);
+                    minute = this.timePickerMinutes ? parseInt(this.container.find('.right .minuteselect').val(), 10) : 0;
                     if (isNaN(minute)) {
                         minute = parseInt(this.container.find('.right .minuteselect option:last').val(), 10);
                     }
@@ -929,25 +933,26 @@
             //
             // minutes
             //
+            if (this.timePickerMinutes) {
+                html += ': <select class="minuteselect">';
 
-            html += ': <select class="minuteselect">';
+                for (var i = 0; i < 60; i += this.timePickerIncrement) {
+                    var padded = i < 10 ? '0' + i : i;
+                    var time = selected.clone().minute(i);
 
-            for (var i = 0; i < 60; i += this.timePickerIncrement) {
-                var padded = i < 10 ? '0' + i : i;
-                var time = selected.clone().minute(i);
+                    var disabled = false;
+                    if (minDate && time.second(59).isBefore(minDate))
+                        disabled = true;
+                    if (maxDate && time.second(0).isAfter(maxDate))
+                        disabled = true;
 
-                var disabled = false;
-                if (minDate && time.second(59).isBefore(minDate))
-                    disabled = true;
-                if (maxDate && time.second(0).isAfter(maxDate))
-                    disabled = true;
-
-                if (selected.minute() == i && !disabled) {
-                    html += '<option value="' + i + '" selected="selected">' + padded + '</option>';
-                } else if (disabled) {
-                    html += '<option value="' + i + '" disabled="disabled" class="disabled">' + padded + '</option>';
-                } else {
-                    html += '<option value="' + i + '">' + padded + '</option>';
+                    if (selected.minute() == i && !disabled) {
+                        html += '<option value="' + i + '" selected="selected">' + padded + '</option>';
+                    } else if (disabled) {
+                        html += '<option value="' + i + '" disabled="disabled" class="disabled">' + padded + '</option>';
+                    } else {
+                        html += '<option value="' + i + '">' + padded + '</option>';
+                    }
                 }
             }
 
@@ -1315,7 +1320,7 @@
                         if (ampm === 'AM' && hour === 12)
                             hour = 0;
                     }
-                    var minute = parseInt(this.container.find('.left .minuteselect').val(), 10);
+                    var minute = this.timePickerMinutes ? parseInt(this.container.find('.left .minuteselect').val(), 10) : 0;
                     if (isNaN(minute)) {
                         minute = parseInt(this.container.find('.left .minuteselect option:last').val(), 10);
                     }
@@ -1338,7 +1343,7 @@
                         if (ampm === 'AM' && hour === 12)
                             hour = 0;
                     }
-                    var minute = parseInt(this.container.find('.right .minuteselect').val(), 10);
+                    var minute = this.timePickerMinutes ? parseInt(this.container.find('.right .minuteselect').val(), 10) : 0;
                     if (isNaN(minute)) {
                         minute = parseInt(this.container.find('.right .minuteselect option:last').val(), 10);
                     }
@@ -1370,7 +1375,7 @@
             var i = 0;
             for (var range in this.ranges) {
               if (this.timePicker) {
-                    var format = this.timePickerSeconds ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD HH:mm";
+                    var format = this.timePickerSeconds ? "YYYY-MM-DD HH:mm:ss" : (this.timePickerMinutes ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD HH");
                     //ignore times when comparing dates if time picker seconds is not enabled
                     if (this.startDate.format(format) == this.ranges[range][0].format(format) && this.endDate.format(format) == this.ranges[range][1].format(format)) {
                         customRange = false;
@@ -1457,7 +1462,7 @@
                 isLeft = cal.hasClass('left');
 
             var hour = parseInt(cal.find('.hourselect').val(), 10);
-            var minute = parseInt(cal.find('.minuteselect').val(), 10);
+            var minute = this.timePickerMinutes ? parseInt(cal.find('.minuteselect').val(), 10) : 0;
             if (isNaN(minute)) {
                 minute = parseInt(cal.find('.minuteselect option:last').val(), 10);
             }
