@@ -50,7 +50,7 @@
         this.timePicker = false;
         this.timePicker24Hour = false;
         this.timePickerIncrement = 1;
-        this.timePickerMinutes = false;
+        this.timePickerMinutes = true;
         this.timePickerSeconds = false;
         this.linkedCalendars = true;
         this.autoUpdateInput = true;
