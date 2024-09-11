@@ -1434,6 +1434,10 @@
                     this.chosenLabel = null;
                 }
                 this.showCalendars();
+                if(this.hideRangesWhenCustomFocus){
+                    this.container.find('.ranges li.predefined-range').hide();
+                    this.container.find('.ranges li#predefined-ranges-toggler').show();
+                }
             }
         },
 
