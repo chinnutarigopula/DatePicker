@@ -40,6 +40,8 @@
         this.maxDate = false;
         this.maxSpan = false;
         this.autoApply = false;
+        this.showTwoMonth = true;
+        this.hideRangesWhenCustomFocus = false;
         this.singleDatePicker = false;
         this.showDropdowns = false;
         this.minYear = moment().subtract(100, 'year').format('YYYY');
@@ -76,6 +78,7 @@
             cancelLabel: 'Cancel',
             weekLabel: 'W',
             customRangeLabel: 'Custom Range',
+            predefinedRangeLabel: 'Predefined Ranges',
             daysOfWeek: moment.weekdaysMin(),
             monthNames: moment.monthsShort(),
             firstDay: moment.localeData().firstDayOfWeek()
@@ -158,6 +161,14 @@
                 elem.innerHTML = options.locale.customRangeLabel;
                 var rangeHtml = elem.value;
                 this.locale.customRangeLabel = rangeHtml;
+            }
+
+            if (typeof options.locale.predefinedRangeLabel === 'string'){
+                //Support unicode chars in the custom range name.
+                var elem = document.createElement('textarea');
+                elem.innerHTML = options.locale.predefinedRangeLabel;
+                var rangeHtml = elem.value;
+                this.locale.predefinedRangeLabel = rangeHtml;
             }
         }
         this.container.addClass(this.locale.direction);
@@ -263,6 +274,12 @@
         if (typeof options.autoApply === 'boolean')
             this.autoApply = options.autoApply;
 
+        if (typeof options.showTwoMonth === 'boolean')
+            this.showTwoMonth = options.showTwoMonth;
+
+        if (typeof options.hideRangesWhenCustomFocus === 'boolean')
+            this.hideRangesWhenCustomFocus = options.hideRangesWhenCustomFocus;
+
         if (typeof options.autoUpdateInput === 'boolean')
             this.autoUpdateInput = options.autoUpdateInput;
 
@@ -350,8 +367,11 @@
             }
 
             var list = '<ul>';
+            if(this.hideRangesWhenCustomFocus){
+                list += '<li id="predefined-ranges-toggler" style="display: none" data-range-key="' + this.locale.predefinedRangeLabel + '">' + this.locale.predefinedRangeLabel + '</li>';
+            }
             for (range in this.ranges) {
-                list += '<li data-range-key="' + range + '">' + range + '</li>';
+                list += '<li class="predefined-range" data-range-key="' + range + '">' + range + '</li>';
             }
             if (this.showCustomRangeLabel) {
                 list += '<li data-range-key="' + this.locale.customRangeLabel + '">' + this.locale.customRangeLabel + '</li>';
@@ -389,6 +409,10 @@
             if (!this.timePicker && this.autoApply) {
                 this.container.addClass('auto-apply');
             }
+        }
+
+        if(!this.showTwoMonth && !this.timePicker){
+            this.container.find('.drp-calendar.right').hide();
         }
 
         if ((typeof options.ranges === 'undefined' && !this.singleDatePicker) || this.alwaysShowCalendars) {
@@ -743,7 +767,11 @@
             if ((!maxDate || maxDate.isAfter(calendar.lastDay)) && (!this.linkedCalendars || side == 'right' || this.singleDatePicker)) {
                 html += '<th class="next available"><span></span></th>';
             } else {
-                html += '<th></th>';
+                if(side == 'left' && !this.showTwoMonth && !this.timePicker){
+                    html += '<th class="next available"><span></span></th>';
+                }else{
+                    html += '<th></th>';
+                }
             }
 
             html += '</tr>';
@@ -1208,6 +1236,17 @@
             this.chosenLabel = label;
             if (label == this.locale.customRangeLabel) {
                 this.showCalendars();
+                if(this.hideRangesWhenCustomFocus){
+                    this.container.find('.ranges li.predefined-range').hide();
+                    this.container.find('.ranges li#predefined-ranges-toggler').show();
+                }
+            } else if (label == this.locale.predefinedRangeLabel) {
+                if(this.hideRangesWhenCustomFocus){
+                    if (!this.alwaysShowCalendars)
+                        this.hideCalendars();
+                    this.container.find('.ranges li.predefined-range').show();
+                    this.container.find('.ranges li#predefined-ranges-toggler').hide();
+                }
             } else {
                 var dates = this.ranges[label];
                 this.startDate = dates[0];
@@ -1369,7 +1408,8 @@
             var customRange = true;
             var i = 0;
             for (var range in this.ranges) {
-              if (this.timePicker) {
+                i++;
+                if (this.timePicker) {
                     var format = this.timePickerSeconds ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD HH:mm";
                     //ignore times when comparing dates if time picker seconds is not enabled
                     if (this.startDate.format(format) == this.ranges[range][0].format(format) && this.endDate.format(format) == this.ranges[range][1].format(format)) {
@@ -1385,8 +1425,8 @@
                         break;
                     }
                 }
-                i++;
             }
+            
             if (customRange) {
                 if (this.showCustomRangeLabel) {
                     this.chosenLabel = this.container.find('.ranges li:last').addClass('active').attr('data-range-key');
@@ -1394,6 +1434,10 @@
                     this.chosenLabel = null;
                 }
                 this.showCalendars();
+                if(this.hideRangesWhenCustomFocus){
+                    this.container.find('.ranges li.predefined-range').hide();
+                    this.container.find('.ranges li#predefined-ranges-toggler').show();
+                }
             }
         },
 
